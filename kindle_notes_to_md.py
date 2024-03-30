@@ -15,7 +15,12 @@ from eglogging import *
 
 logging_load_human_config()
 
-
+'''
+(ago, Mar 24, 2024)
+Using my version of Kindle 7.4.0, there is the marked text missing in the generated .md file 
+(ago, Mar 30, 2024)
+Made a couple of adjustments to better suit my needs
+'''
 class Note:
   # highlight, possibly including a note
   def __init__(self):
@@ -148,8 +153,9 @@ class Kindle_notes:
         if last_note_type == 'Highlight':
           wip_note.text = div_contents
 
-        elif last_note_type == 'Note':
-          wip_note.note = div_contents
+        #elif last_note_type == 'Note':
+        wip_note.note = div_contents
+        # make sure that the indent is reduced
 
   def output_md(self, args):
 
@@ -160,27 +166,33 @@ class Kindle_notes:
     md += "  - tags: #Books\n"
 
     # all the highlights
-    md += "- # Raw Highlights & Notes:\n"
+    md += "\n"
+    md += "# Raw Highlights & Notes:\n"
 
     # for each chapter...
     for chapter in self.chapter_notes:
       # add a new heading 1 bullet with the chapter title
-      md += "  - ## {}\n".format(chapter.title)
+      md += " ## {}\n".format(chapter.title)
 
       # for each note in the chapter...
       for location in chapter.notes:
         note = chapter.notes[location]
 
-        # add the highlighted text
-        md += "    - {}\n".format(note.text)
+        # add the highlighted text, but only if there is a text (ago, 30/03/24)
+        if (len(note.text) != 0):
+          md += "    - {}\n".format(note.text)
 
         # if there is a note, add it in bold
-        if note.note != '':
-          md += "      - **{}**\n".format(note.note)
+        
+        # if note.note != '':
+        #   md += "      - **{}**\n".format(note.note)
+        # ago, 2024-03-24: sorry, I don't want the note in bold
+        md += "      - {}\n".format(note.note)
 
         if args.location:
           # add the source of the text
           md += "      - {}\n".format(note.source)
+        md += "--------------------\n"
 
     if args.clipboard:
       pyperclip.copy(md)
